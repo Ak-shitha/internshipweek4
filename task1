@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image:url(picture7.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            background-color: #F4C2C2;
+        }
+
+       .container {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    border-radius: 15px; /* Increase this value for more rounded corners */
+    margin-left: 20px; /* Adjust the left margin as per your preference */
+}
+
+
+
+        h1 {
+            color: #ff66b2;
+        }
+
+        .todo-container {
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffe6f2;
+            color: #ff66b2;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-icons {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select {
+            padding: 8px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #ff66b2;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff3385;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <div class="todo-container">
+            <ul id="todo-list"></ul>
+            <input type="text" id="task" placeholder="Add a new task...">
+            <i class="task-icons fas fa-calendar"></i>
+            <input type="date" id="due-date">
+            <i class="task-icons fas fa-clock"></i>
+            <input type="time" id="due-time">
+            <i class="task-icons fas fa-tag"></i>
+            <select id="category">
+                <option value="personal">Personal</option>
+                <option value="work">Work</option>
+                <option value="shopping">Shopping</option>
+                <option value="other">Other</option>
+            </select>
+            <button onclick="addTask()">Add Task</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        function addTask() {
+            var task = document.getElementById("task").value;
+            var dueDate = document.getElementById("due-date").value;
+            var dueTime = document.getElementById("due-time").value;
+            var category = document.getElementById("category").value;
+
+            if (task === "" || dueDate === "" || dueTime === "") return;
+
+            var dueDateTime = new Date(dueDate + "T" + dueTime);
+            var currentTime = new Date();
+
+            if (dueDateTime <= currentTime) {
+                alert("Invalid due date and time. Please select a future date and time.");
+                return;
+            }
+
+            var ul = document.getElementById("todo-list");
+            var li = document.createElement("li");
+            var taskText = document.createElement("span");
+            taskText.innerText = task;
+            var dateText = document.createElement("span");
+            dateText.innerText = dueDateTime.toLocaleDateString() + " " + dueDateTime.toLocaleTimeString();
+            var categoryText = document.createElement("span");
+            categoryText.innerText = category.charAt(0).toUpperCase() + category.slice(1);
+            var icons = document.createElement("div");
+            icons.classList.add("task-icons");
+            icons.innerHTML = '<i class="fas fa-trash-alt"></i>';
+
+            li.appendChild(taskText);
+            li.appendChild(dateText);
+            li.appendChild(categoryText);
+            li.appendChild(icons);
+            ul.appendChild(li);
+
+            icons.addEventListener("click", function () {
+                ul.removeChild(li);
+            });
+
+            var reminderTime = dueDateTime.getTime() - currentTime.getTime();
+            setTimeout(function () {
+                playAlarm();
+                alert("Task Reminder: " + task);
+            }, reminderTime);
+
+            document.getElementById("task").value = "";
+            document.getElementById("due-date").value = "";
+            document.getElementById("due-time").value = "";
+            document.getElementById("category").value = "personal";
+        }
+
+        function playAlarm() {
+            var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            var oscillator = audioContext.createOscillator();
+            oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+            oscillator.type = 'sine';
+            oscillator.connect(audioContext.destination);
+            oscillator.start();
+            setTimeout(function () {
+                oscillator.stop();
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
